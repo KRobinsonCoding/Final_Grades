@@ -1,15 +1,17 @@
 import csv
+import os.path
 from PyQt6.QtWidgets import *
 from gui import *
 
 class Logic(QMainWindow, Ui_Grade_Window):
     def __init__(self)->None:
         """
-        Method that sets up grade window and creates grades.csv file
+        Method that sets up grade window
+        :return: None
         """
         super().__init__()
         self.setupUi(self)
-        self.validate_attempts()
+        self.hide_scores()
         self.input_attempts.textChanged.connect(lambda: self.validate_input())
         self.input_score1.textChanged.connect(lambda: self.validate_input())
         self.input_score2.textChanged.connect(lambda: self.validate_input())
@@ -17,13 +19,24 @@ class Logic(QMainWindow, Ui_Grade_Window):
         self.input_score4.textChanged.connect(lambda: self.validate_input())
         self.input_student_name.textChanged.connect(lambda: self.validate_input())
         self.button_submit.clicked.connect(lambda: self.submit())
-        with open('grades.csv', 'w', newline='') as csvfile: # overwrite or append
-            writer = csv.writer(csvfile, delimiter=',')
-            writer.writerow(['Name', 'Score 1', 'Score 2', 'Score 3', 'Score 4', 'Average'])
+        self.exists_csv()
 
-    def validate_input(self)->None:
+    def exists_csv(self)->None: # why is it yellow
+        """
+        method that creates csv file if it doesn't exist
+        :return: None
+        """
+        file_name = 'grades.csv'
+        if not os.path.isfile(file_name):
+            with open('grades.csv', 'w', newline='') as csvfile:
+                writer = csv.writer(csvfile, delimiter=',')
+                writer.writerow(['Name', 'Score 1', 'Score 2', 'Score 3', 'Score 4', 'Average'])
+
+
+    def validate_input(self)->None: #method question
         """
         Method that makes sure all the inputs are valid, if they are the submit button turns green
+        :return: None
         """
         self.label_error.setText('')
         self.validate_attempts()
@@ -34,14 +47,12 @@ class Logic(QMainWindow, Ui_Grade_Window):
         else:
             self.button_submit.setStyleSheet("color: black;")
 
-    def validate_attempts(self)->None:
+    def validate_attempts(self)->None: #error message in method?
         """
         Method that validates the attempts input
+        :return: None
         """
-        if self.input_attempts.text() == '':
-            self.hide_scores()
-            # should this be accepted as all zeros?
-        elif self.input_attempts.text() == '1':
+        if self.input_attempts.text() == '1':
             self.show_scores(1)
         elif self.input_attempts.text() == '2':
             self.show_scores(2)
@@ -50,13 +61,14 @@ class Logic(QMainWindow, Ui_Grade_Window):
         elif self.input_attempts.text() == '4':
             self.show_scores(4)
         else:
+            self.hide_scores()
             self.label_error.setStyleSheet("color: red;")
             self.label_error.setText("Number of attempts should be an\ninteger between 1 and 4")
-            self.hide_scores()
 
     def validate_scores(self)->None:
         """
         Method that validates the scores input
+        :return: None
         """
         input_list = [self.input_score1.text(), self.input_score2.text(), self.input_score3.text(),self.input_score4.text()]
         try:
@@ -75,6 +87,7 @@ class Logic(QMainWindow, Ui_Grade_Window):
     def validate_name(self)->None:
         """
         Method that makes sure the name input is not empty
+        :return: None
         """
         if self.input_student_name.text() == '':
             self.label_error.setStyleSheet("color: red;")
@@ -84,6 +97,7 @@ class Logic(QMainWindow, Ui_Grade_Window):
         """
         Method that shows the scores input labels and boxes
         :param attempts: indicates how many of the score labels/boxes should be shown
+        :return: None
         """
         if attempts >= 1:
             self.label_score1.show()
@@ -101,6 +115,7 @@ class Logic(QMainWindow, Ui_Grade_Window):
     def hide_scores(self)->None:
         """
         Method that clears and hides the scores input labels and boxes
+        :return: None
         """
         self.label_score1.hide()
         self.input_score1.hide()
@@ -115,9 +130,10 @@ class Logic(QMainWindow, Ui_Grade_Window):
         self.input_score3.setText('')
         self.input_score4.setText('')
 
-    def submit(self)->None:
+    def submit(self)->None: #should ave be float or not?
         """
         Method that writes the grades to the csv file and resets the user interface
+        :return: None
         """
         self.validate_input()
         if self.label_error.text() == '':
@@ -130,7 +146,7 @@ class Logic(QMainWindow, Ui_Grade_Window):
                     input_list[num] = int(input_list[num])
             with open('grades.csv', 'a', newline='') as csvfile:
                 writer = csv.writer(csvfile)
-                writer.writerow([self.input_student_name.text(), input_list[0], input_list[1], input_list[2], input_list[3], sum(input_list)/len(input_list)])
+                writer.writerow([self.input_student_name.text(), input_list[0], input_list[1], input_list[2], input_list[3], f'{sum(input_list)/len(input_list):.2f}'])
             self.hide_scores()
             self.input_student_name.setText('')
             self.input_attempts.setText('')
