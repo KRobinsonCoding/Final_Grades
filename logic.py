@@ -21,7 +21,7 @@ class Logic(QMainWindow, Ui_Grade_Window):
         self.button_submit.clicked.connect(lambda: self.submit())
         self.exists_csv()
 
-    def exists_csv(self)->None: # why is it yellow
+    def exists_csv(self)->None:
         """
         method that creates csv file if it doesn't exist
         :return: None
@@ -33,23 +33,24 @@ class Logic(QMainWindow, Ui_Grade_Window):
                 writer.writerow(['Name', 'Score 1', 'Score 2', 'Score 3', 'Score 4', 'Average'])
 
 
-    def validate_input(self)->None: #method question
+    def validate_input(self)->None:
         """
-        Method that makes sure all the inputs are valid, if they are the submit button turns green
+        Method that makes sure all the inputs are valid,
+        if all input are valid the submit button turns green, if not the submit button turns white
         :return: None
         """
         self.label_error.setText('')
         self.validate_attempts()
         self.validate_scores()
         self.validate_name()
-        if self.label_error.text() == '':
+        if self.label_error.text() == '': #if all the input is valid the error message will be blank
             self.button_submit.setStyleSheet("background-color: green; color: white;")
         else:
             self.button_submit.setStyleSheet("color: black;")
 
-    def validate_attempts(self)->None: #error message in method?
+    def validate_attempts(self)->None:
         """
-        Method that validates the attempts input
+        Method that adds error message to gui if attempts input is invalid
         :return: None
         """
         if self.input_attempts.text() == '1':
@@ -67,7 +68,7 @@ class Logic(QMainWindow, Ui_Grade_Window):
 
     def validate_scores(self)->None:
         """
-        Method that validates the scores input
+        Method that adds error message to gui if scores input is invalid
         :return: None
         """
         input_list = [self.input_score1.text(), self.input_score2.text(), self.input_score3.text(),self.input_score4.text()]
@@ -86,7 +87,7 @@ class Logic(QMainWindow, Ui_Grade_Window):
 
     def validate_name(self)->None:
         """
-        Method that makes sure the name input is not empty
+        Method that adds error message to gui if name input is empty
         :return: None
         """
         if self.input_student_name.text() == '':
@@ -130,9 +131,9 @@ class Logic(QMainWindow, Ui_Grade_Window):
         self.input_score3.setText('')
         self.input_score4.setText('')
 
-    def submit(self)->None: #should ave be float or not?
+    def submit(self)->None:
         """
-        Method that writes the grades to the csv file and resets the user interface
+        Method that writes the grades to the csv file, resets the user interface, and adds success message to gui
         :return: None
         """
         self.validate_input()
